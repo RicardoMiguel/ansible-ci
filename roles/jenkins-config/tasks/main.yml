@@ -1,0 +1,23 @@
+---
+  - name: Restart Jenkins If Necessary
+    service: name=jenkins state=restarted
+
+  - name: Copy Credentials File
+    template: src=../files/github-credentials.xml.j2 dest={{ jenkins_jar_folder }}/credentials.xml
+
+  - name: Copy GitHub Configuration File
+    template: src=../files/config.xml.j2 dest={{ jenkins_jar_folder }}/config.xml
+
+  - name: Wait for Jenkins to startup required services
+    pause:
+      seconds: 20
+
+  - name: Create Jenkins GitHub Credentials
+    shell: "java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }} create-credentials-by-xml system::system::jenkins '(global)' --username {{ jenkins_admin_username }} --password {{ jenkins_admin_password }} < {{ jenkins_jar_folder }}/credentials.xml"
+    args:
+      creates: "{{ jenkins_home }}/credentials.xml"
+
+  - name: Create GitHub Organization Job
+    shell: "java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }} create-job {{ jenkins_organization_job }} --username {{ jenkins_admin_username }} --password {{ jenkins_admin_password }} < {{ jenkins_jar_folder }}/config.xml"
+    args:
+      creates: "{{ jenkins_home }}/jobs/{{ jenkins_organization_job }}"

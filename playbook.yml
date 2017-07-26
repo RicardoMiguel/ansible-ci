@@ -1,0 +1,5 @@
+---
+- include: basic.yml
+- include: java.yml
+- include: jenkins.yml
+- include: nginx.yml

@@ -1,0 +1,27 @@
+---
+  - hosts: localhost
+    become: true
+    vars:
+      jenkins_jar_folder: /opt
+      jenkins_organization_folder: RicardoMiguel
+      jenkins_organization_job: RicardoMiguel-GitHub
+      jenkins_github_id: github-credentials
+      jenkins_github_username: jenkins-RicardoMiguel
+      jenkins_github_password: "{{ lookup('password', 'credentials/github_password.txt') }}"
+
+      jenkins_home: /var/lib/jenkins
+      jenkins_hostname: localhost
+      jenkins_http_port: 8080
+      jenkins_url_prefix: "/jenkins"
+      jenkins_admin_username: ricardo.soares
+      jenkins_admin_password: "{{ lookup('password', 'credentials/jenkins_password.txt') }}"
+      jenkins_jar_location: "{{ jenkins_jar_folder }}/jenkins-cli.jar"
+      jenkins_plugin_timeout: 120
+      jenkins_plugins:
+        - workflow-aggregator
+        - github-organization-folder
+        - github-branch-source
+        - slack
+    roles:
+      - jenkins
+      - jenkins-config

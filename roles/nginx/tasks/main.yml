@@ -1,0 +1,26 @@
+- name: Install Nginx
+  apt: name=nginx state=present
+
+# - name: Redirect all Http to Https
+#   template: src=../files/conf.d/http_redirect.conf.j2 dest=/etc/nginx/conf.d/http_redirect.conf
+
+- name: Configure General Security
+  copy: src=../files/conf.d/security.conf dest=/etc/nginx/conf.d/security.conf
+
+- name: Configure SSL
+  copy: src=../files/conf.d/ssl.conf dest=/etc/nginx/conf.d/ssl.conf
+
+- name: Copy Certificates
+  copy: src=../files/ssl/ dest=/etc/nginx/ssl/
+
+- name: Add Jenkins as Reverse Proxy
+  template: src=../files/sites-available/jenkins.j2 dest=/etc/nginx/sites-available/jenkins
+
+- name: Create Symlink for jenkins
+  file: src=/etc/nginx/sites-available/jenkins dest=/etc/nginx/sites-enabled/jenkins state=link
+
+- name: Remove default symlink nginx homepage
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: Reload Service
+  service: name=nginx state=reloaded
