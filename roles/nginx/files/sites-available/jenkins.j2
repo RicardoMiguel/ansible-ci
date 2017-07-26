@@ -4,9 +4,13 @@ upstream ci-jenkins {
 
 server {
         listen 443 ssl;
-        server_name {{ inventory_hostname }};
+        server_name _;
 
+        root /usr/share/nginx/html;
+        
         location /jenkins {
+                sendfile off;
+
                 proxy_pass http://ci-jenkins/jenkins;
                 # Rewrite location. See https://www.phase2technology.com/blog/running-jenkins-behind-nginx/
                 proxy_redirect http:// https://;
